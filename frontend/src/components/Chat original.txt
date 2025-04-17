@@ -1,0 +1,160 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { X, Send } from 'lucide-react';
+import { io, Socket } from 'socket.io-client';
+
+interface ChatMessage {
+  id: string;
+  senderId: string;
+  content: string;
+  timestamp: string;
+}
+
+interface ChatProps {
+  bookingId: string;
+  onClose: () => void;
+}
+
+export const Chat: React.FC<ChatProps> = ({ bookingId, onClose }) => {
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const response = await fetch(`http://localhost:3001/messages/${bookingId}`);
+      const data = await response.json();
+      setMessages(data);
+    };
+
+    fetchMessages();
+
+    const newSocket = io('http://localhost:3001', {
+      query: { bookingId, userId: user?.id },
+    });
+
+    newSocket.on('connect', () => {
+      setIsConnected(true);
+      console.log(`Connected to room ${bookingId}`);
+    });
+
+    newSocket.on('disconnect', () => {
+      setIsConnected(false);
+      console.log(`Disconnected from room ${bookingId}`);
+    });
+
+    newSocket.on('message', (message: ChatMessage) => {
+      console.log('New message received:', message);
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+    };
+  }, [bookingId, user]);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:3001', {
+      query: { bookingId, userId: user?.id },
+    });
+
+    newSocket.on('message', (message: ChatMessage) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+    };
+  }, [bookingId, user]); // Ensure dependencies are correct
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !user || !socket) return;
+
+    const message: ChatMessage = {
+      id: crypto.randomUUID(),
+      senderId: user.id,
+      content: newMessage.trim(),
+      timestamp: new Date().toISOString(),
+    };
+
+    socket.emit('message', message);
+    setMessages((prevMessages) => [...prevMessages, message]);
+    setNewMessage('');
+  };
+
+  return (
+    <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl flex flex-col z-50">
+      <div className="flex items-center justify-between p-4 border-b">
+        <div>
+          <h3 className="text-lg font-semibold">Chat</h3>
+          {!isConnected && (
+            <p className="text-sm text-red-500">Connecting...</p>
+          )}
+        </div>
+        <button
+          onClick={onClose}
+          className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map(message => (
+          <div
+            key={message.id}
+            className={`flex ${
+              message.senderId === user?.id ? 'justify-end' : 'justify-start'
+            }`}
+          >
+            <div
+              className={`max-w-xs px-4 py-2 rounded-lg ${
+                message.senderId === user?.id
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-900'
+              }`}
+            >
+              <p className="break-words">{message.content}</p>
+              <p className="text-xs mt-1 opacity-75">
+                {new Date(message.timestamp).toLocaleTimeString()}
+              </p>
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <form onSubmit={handleSendMessage} className="p-4 border-t">
+        <div className="flex space-x-2">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            disabled={!isConnected}
+          />
+          <button
+            type="submit"
+            className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isConnected}
+          >
+            <Send className="h-5 w-5" />
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
