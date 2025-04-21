@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
         bookingId = 'test-booking',
         userId = 'test-user',
         userType = 'test'
-    } = socket.handshake.query;
+    } = socket.handshake.query;//Extracts bookingId, userId, and userType from the query string. & Defaults to test values if none are provided (for testing/dev).
 
     console.log(`Connection established - Booking: ${bookingId}, User: ${userId}, Type: ${userType}`);
 
@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
     console.log(`${userType} ${userId} connected for booking ${bookingId}`);
 
     // Join the booking-specific room
-    socket.join(bookingId);
+    socket.join(bookingId);//Joins the socket to a room named by bookingId — this ensures only mentor and student of the same session can chat.
 
     // Notify other participant about new connection
     socket.to(bookingId).emit('user-connected', { userId, userType });

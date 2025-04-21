@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { getBookings } from '../utils/localStorage';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 
-interface Notification {
+interface Notification {//features of notificaton
   id: string;
   userId: string;
   message: string;
@@ -12,7 +12,7 @@ interface Notification {
   bookingId?: string;
 }
 
-interface NotificationContextType {
+interface NotificationContextType {//what this notification  context will provide to other components
   notifications: Notification[];
   markAsRead: (id: string) => void;
   addNotification: (userId: string, message: string, bookingId?: string) => void;
@@ -24,9 +24,11 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [processedBookings] = useState(new Set<string>());
+  const [processedBookings] = useState(new Set<string>());//A Set to keep track of which booking notifications have already been handled (so it doesn’t show them again).
   const { user } = useAuth();
 
+
+  //Load Notifications from LocalStorage (on user login)
   useEffect(() => {
     if (user) {
       const storedNotifications = JSON.parse(localStorage.getItem(`notifications_${user.id}`) || '[]');
@@ -34,6 +36,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [user]);
 
+
+//Check for New Bookings Every 30 Seconds
   useEffect(() => {
     if (user) {
       const checkNewBookings = () => {
@@ -47,16 +51,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           if (!processedBookings.has(booking.id)) {
             processedBookings.add(booking.id);
             
-            const isTeacher = booking.teacherId === user.id;
-            const message = isTeacher
-              ? `New booking request for your session`
-              : `Your booking request has been created`;
+            // const isTeacher = booking.teacherId === user.id;
+            // const message = isTeacher
+            //   ? `New booking request for your session`
+            //   : `Your booking request has been created`;
             
             // Only show toast for new bookings
-            toast(message, {
-              icon: '📅',
-              duration: 5000,
-            });
+            // toast(message, {
+            //   icon: '📅',
+            //   duration: 5000,
+            // });
           }
         });
       };
@@ -67,6 +71,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [user, processedBookings]);
 
+
+// Add New Notification
   const addNotification = (userId: string, message: string, bookingId?: string) => {
     // Check if a notification with the same bookingId already exists
     if (bookingId && notifications.some(n => n.bookingId === bookingId)) {
@@ -97,12 +103,17 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  // Clear All Notifications empty array
+  // This function clears all notifications for the current user
   const clearAllNotifications = () => {
     if (user) {
       setNotifications([]);
       localStorage.setItem(`notifications_${user.id}`, JSON.stringify([]));
     }
   };
+
+
+  // Count unread notifications
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
