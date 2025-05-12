@@ -2,10 +2,7 @@
 
 ## 1. Title Page
 - **Project Title**: "Student Freelancing Platform"
-- **Submitted By**: Your Name(s)
-- **Submitted To**: Lecturer's Name
-- **Date**: Submission Date
-- **Institution Name**
+
 
 ---
 
