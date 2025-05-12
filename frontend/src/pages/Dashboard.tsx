@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { getSkills, saveSkill, saveBooking, getUsers, updateSkill } from '../utils/localStorage';
 import { Skill, Booking, SKILL_CATEGORIES, SkillCategory } from '../types';
-import { Plus, Book, Edit, X, Search, Filter, Sparkles, Star, DollarSign, Clock, Trash2 } from 'lucide-react';
+import { Plus, Book, Edit, X, Search, Filter, Star, DollarSign, Clock, Trash2, Grid, List } from 'lucide-react';
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -25,6 +25,7 @@ export const Dashboard = () => {
   const [selectedDetailSkill, setSelectedDetailSkill] = useState<Skill | null>(null);
   const [selectedMySkill, setSelectedMySkill] = useState<Skill | null>(null);
   const [showMySkillModal, setShowMySkillModal] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const skills = getSkills();
   const users = getUsers();
@@ -67,7 +68,6 @@ export const Dashboard = () => {
         category: editingSkill.category
       });
       setEditingSkill(null);
-      // Close the modal if it's open
       setShowMySkillModal(false);
     }
   };
@@ -88,9 +88,7 @@ export const Dashboard = () => {
         status: 'pending'
       };
       saveBooking(booking);
-      
       addNotification(selectedSkill.userId, `New booking request for your session`, booking.id);
-      
       setShowBookingModal(false);
       setSelectedSkill(null);
       setBookingDate('');
@@ -102,29 +100,31 @@ export const Dashboard = () => {
     setShowDetailModal(true);
   };
 
-// Add this near your other handler functions
-const handleMySkillClick = (skill: Skill) => {
-  setSelectedMySkill(skill);
-  setShowMySkillModal(true);
-};
+  const handleMySkillClick = (skill: Skill) => {
+    setSelectedMySkill(skill);
+    setShowMySkillModal(true);
+  };
 
-const handleDeleteSkill = (skillId: string) => {
-  const skills = getSkills();
-  const updatedSkills = skills.filter(skill => skill.id !== skillId);
-  localStorage.setItem('skills', JSON.stringify(updatedSkills));
-  setEditingSkill(null);
-  setShowMySkillModal(false);
-};
+  const handleDeleteSkill = (skillId: string) => {
+    const skills = getSkills();
+    const updatedSkills = skills.filter(skill => skill.id !== skillId);
+    localStorage.setItem('skills', JSON.stringify(updatedSkills));
+    setEditingSkill(null);
+    setShowMySkillModal(false);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-12">
+        {/* My Skills Section */}
+        <div className="mb-12 bg-white rounded-2xl p-8 shadow-sm">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-slate-800">My Skills</h2>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              My Skills
+            </h2>
             <button
               onClick={() => setShowAddSkill(!showAddSkill)}
-              className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-md hover:shadow-lg"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
             >
               <Plus className="h-5 w-5 mr-2" />
               Share Your Skills
@@ -132,68 +132,58 @@ const handleDeleteSkill = (skillId: string) => {
           </div>
 
           {showAddSkill && (
-            <form onSubmit={handleAddSkill} className="bg-gray-300 p-4 rounded-xl border border-silver/20 overflow-hidden shadow-xl mb-8">
+            <form onSubmit={handleAddSkill} className="bg-purple-50 p-6 rounded-2xl border border-purple-100 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="skill-title" className="block text-silver text-sm font-medium mb-2">Title</label>
+                  <label className="block text-purple-700 text-sm font-medium mb-2">Title</label>
                   <input
-                    id="skill-title"
                     type="text"
                     required
                     value={newSkill.title}
                     onChange={(e) => setNewSkill({ ...newSkill, title: e.target.value })}
-                    className="w-full bg-whit border border-silver/30 rounded-lg px-4 py-2 text-black focus:ring-2 focus:ring-silver focus:border-transparent"
+                    className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="What skill will you teach?"
-                    aria-label="Skill Title"
                   />
                 </div>
                 <div>
-                  <label htmlFor="skill-category" className="block text-silver text-sm font-medium mb-2">Category</label>
+                  <label className="block text-purple-700 text-sm font-medium mb-2">Category</label>
                   <select
-                    id="skill-category"
                     required
                     value={newSkill.category}
                     onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value as SkillCategory })}
-                    className="w-full bg-whit border border-silver/30 rounded-lg px-4 py-2 text-black focus:ring-2 focus:ring-silver focus:border-transparent"
-                    aria-label="Select skill category"
+                    className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     {SKILL_CATEGORIES.map(category => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
+                      <option key={category} value={category}>{category}</option>
                     ))}
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label htmlFor="skill-description" className="block text-silver text-sm font-medium mb-2">Description</label>
+                  <label className="block text-purple-700 text-sm font-medium mb-2">Description</label>
                   <textarea
-                    id="skill-description"
                     required
                     value={newSkill.description}
                     onChange={(e) => setNewSkill({ ...newSkill, description: e.target.value })}
-                    className="w-full bg-whit border border-silver/30 rounded-lg px-4 py-2 text-black focus:ring-2 focus:ring-silver focus:border-transparent h-32"
+                    className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent h-32"
                     placeholder="Describe what students will learn..."
-                    aria-label="Skill description"
                   />
                 </div>
                 <div>
-                  <label htmlFor="skill-rate" className="block text-silver text-sm font-medium mb-2">Rate ($/hour)</label>
+                  <label className="block text-purple-700 text-sm font-medium mb-2">Rate ($/hour)</label>
                   <input
-                    id="skill-rate"
                     type="number"
                     required
                     value={newSkill.rate}
                     onChange={(e) => setNewSkill({ ...newSkill, rate: Number(e.target.value) })}
-                    className="w-full bg-whit border border-silver/30 rounded-lg px-4 py-2 text-black focus:ring-2 focus:ring-silver focus:border-transparent"
+                    className="w-full bg-white border border-purple-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     min="0"
-                    aria-label="Hourly rate"
                   />
                 </div>
               </div>
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6">
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 bg-silver text-black font-bold rounded-lg hover:bg-gray-600 transition-colors duration-300"
+                  className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-xl hover:opacity-90 transition-all duration-300"
                 >
                   Publish Skill
                 </button>
@@ -203,14 +193,14 @@ const handleDeleteSkill = (skillId: string) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {userSkills.map((skill) => (
-              <div 
-                key={skill.id} 
+              <div
+                key={skill.id}
                 onClick={() => handleMySkillClick(skill)}
-                className="bg-white rounded-xl border border-silver/20 overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer p-4"
+                className="bg-white rounded-2xl border border-purple-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer p-6 transform hover:scale-105"
               >
                 <div className="flex flex-col h-full">
                   <div className="flex justify-between items-start">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 w-fit">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                       {skill.category}
                     </span>
                     <button
@@ -218,16 +208,15 @@ const handleDeleteSkill = (skillId: string) => {
                         e.stopPropagation();
                         setEditingSkill(skill);
                       }}
-                      className="p-1 text-indigo-600 hover:text-indigo-800"
-                      aria-label="Edit skill"
+                      className="p-2 text-purple-600 hover:text-purple-800 rounded-full hover:bg-purple-50"
                     >
                       <Edit className="h-4 w-4" />
                     </button>
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-800 mt-2 line-clamp-1">{skill.title}</h3>
-                  <p className="text-gray-400 text-sm mt-1 line-clamp-2">{skill.description}</p>
-                  <div className="flex items-center mt-auto pt-2">
-                    <span className="inline-flex items-center text-indigo-600">
+                  <h3 className="text-lg font-semibold text-gray-800 mt-3">{skill.title}</h3>
+                  <p className="text-gray-500 text-sm mt-2 line-clamp-2">{skill.description}</p>
+                  <div className="flex items-center mt-4 pt-4 border-t border-purple-100">
+                    <span className="inline-flex items-center text-purple-600 font-medium">
                       <DollarSign className="h-4 w-4 mr-1" />
                       {skill.rate}/hour
                     </span>
@@ -237,56 +226,72 @@ const handleDeleteSkill = (skillId: string) => {
             ))}
           </div>
         </div>
-                                       {/* Discover Skills Component */}
-          <div className="mt-16">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-800 mb-6 md:mb-0">Discover Skills</h2>
+
+        {/* Discover Skills Section */}
+        <div className="bg-white rounded-2xl p-8 shadow-sm">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 md:mb-0">
+              Discover Skills
+            </h2>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
-                <div className="relative flex-1 md:flex-none">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search skills..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 pr-4 py-3 w-full md:w-64 rounded-lg bg-white border border-slate-300 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-                <div className="relative flex-1 md:flex-none">
-                  <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value as SkillCategory | 'all')}
-                    className="pl-12 pr-4 py-3 w-full md:w-48 rounded-lg bg-white border border-slate-300 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    aria-label="Filter by category"
-                  >
+              <div className="relative flex-1 md:flex-none">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400" />
+                <input
+                  type="text"
+                  placeholder="Search skills..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 pr-4 py-3 w-full md:w-64 rounded-xl bg-purple-50 border-none text-purple-900 placeholder-purple-400 focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div className="relative flex-1 md:flex-none">
+                <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400" />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value as SkillCategory | 'all')}
+                  className="pl-12 pr-4 py-3 w-full md:w-48 rounded-xl bg-purple-50 border-none text-purple-900 focus:ring-2 focus:ring-purple-500"
+                >
                   <option value="all">All Categories</option>
                   {SKILL_CATEGORIES.map(category => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
+                    <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
+              </div>
+              <div className="flex space-x-2 bg-purple-50 rounded-xl p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-purple-600'}`}
+                >
+                  <Grid className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-white shadow-sm' : 'text-purple-600'}`}
+                >
+                  <List className="h-5 w-5" />
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
             {filteredSkills.map((skill) => (
-              <div 
-                key={skill.id} 
+              <div
+                key={skill.id}
                 onClick={() => handleSkillClick(skill)}
-                className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 card-hover cursor-pointer p-4"
+                className={`bg-white rounded-2xl border border-purple-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer p-6 ${
+                  viewMode === 'grid' ? 'transform hover:scale-105' : ''
+                }`}
               >
                 <div className="flex flex-col h-full">
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 w-fit">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 w-fit">
                     {skill.category}
                   </span>
-                  <h3 className="text-lg font-semibold text-slate-800 mt-2 line-clamp-1">{skill.title}</h3>
-                  <p className="text-gray-400 text-sm mt-1 line-clamp-2">{skill.description}</p>
-                  <div className="flex items-center justify-between mt-auto pt-2">
-                    <span className="text-sm font-semibold text-silver">${skill.rate}/hr</span>
-                    <span className="text-xs text-silver">By {getAuthorName(skill.userId)}</span>
+                  <h3 className="text-lg font-semibold text-gray-800 mt-3">{skill.title}</h3>
+                  <p className="text-gray-500 text-sm mt-2 line-clamp-2">{skill.description}</p>
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-purple-100">
+                    <span className="text-purple-600 font-medium">${skill.rate}/hr</span>
+                    <span className="text-sm text-gray-500">By {getAuthorName(skill.userId)}</span>
                   </div>
                 </div>
               </div>
@@ -384,7 +389,6 @@ const handleDeleteSkill = (skillId: string) => {
           </div>
         )}
 
-        {/* Add this before the existing modals */}
         {showMySkillModal && selectedMySkill && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-8 max-w-2xl w-full border border-slate-200 shadow-xl m-4">
@@ -433,7 +437,6 @@ const handleDeleteSkill = (skillId: string) => {
           </div>
         )}
 
-        {/* Add this edit form modal */}
         {editingSkill && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-gray-200 rounded-xl p-8 max-w-2xl w-full border border-slate-200 shadow-xl m-4">
@@ -501,7 +504,7 @@ const handleDeleteSkill = (skillId: string) => {
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-8 ">
+                <div className="flex justify-between mt-8">
                   <button
                     type="button"
                     onClick={() => handleDeleteSkill(editingSkill.id)}

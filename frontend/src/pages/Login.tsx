@@ -24,6 +24,12 @@ export const Login = () => {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Sign in to your account
         </h2>
+        <ul className="mt-4 text-sm text-gray-600 list-disc list-inside">
+          <li>Please register first with a proper email and password.</li>
+          <li>After registration, you can login to your account.</li>
+          <li>Explore and add your skills to your profile.</li>
+          <li>Discover skills shared by other students to test the app.</li>
+        </ul>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -69,8 +75,8 @@ export const Login = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                bg-gradient-to-r from-purple-600 to-pink-600">
                 Sign in
               </button>
             </div>

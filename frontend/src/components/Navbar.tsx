@@ -12,8 +12,8 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-3 animate-slide-in">
-            <BookOpen className="h-8 w-8 text-primary-600" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 text-transparent bg-clip-text">
+            <BookOpen className="h-8 w-8 text-purple-600" />
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600  text-transparent bg-clip-text">
               StudentSkills
             </span>
           </div>
@@ -54,13 +54,13 @@ export const Navbar = () => {
               <div className="flex items-center space-x-4 animate-fade-in">
                 <button
                   onClick={() => navigate('/login')}
-                  className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors duration-300"
+                  className="px-4 py-2 text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors duration-300 "
                 >
                   Login
                 </button>
                 <button
                   onClick={() => navigate('/register')}
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transform hover:scale-105 transition-all duration-300"
+                  className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transform hover:scale-105 transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600"
                 >
                   Register
                 </button>

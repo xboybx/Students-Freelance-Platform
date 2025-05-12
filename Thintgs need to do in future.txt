@@ -1,0 +1,6 @@
+-Add Db And APis for Skills
+-deploy in railway app
+-remove netlify toml file
+-check correctness of chat fucnctionlaity and render messages correctly through socket io
+-add video call functionality (Optional)
+--cannot run locally cox of netlify file
