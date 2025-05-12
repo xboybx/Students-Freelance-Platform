@@ -25,12 +25,7 @@ export const Register = () => {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Create your account
         </h2>
-        <ul className="mt-4 text-sm text-gray-600 list-disc list-inside">
-          <li>Please register first with a proper email and password.</li>
-          <li>After registration, you can login to your account.</li>
-          <li>Explore and add your skills to your profile.</li>
-          <li>Discover skills shared by other students to test the app.</li>
-        </ul>
+       
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -99,7 +94,21 @@ export const Register = () => {
               </button>
             </div>
           </form>
-        </div>
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => navigate('/login')}
+              className="bg-gradient-to-r from-purple-600 to-pink-600  text-transparent bg-clip-text text-sm font-medium"
+              type="button"
+            >
+              Already have an account? Login
+            </button>
+          </div>
+        </div> <ul className="mt-4 text-sm text-gray-600 list-disc list-inside">
+          <li>Please register first with a proper email and password.</li>
+          <li>After registration, you can login to your account.</li>
+          <li>Explore and add your skills to your profile.</li>
+          <li>Discover skills shared by other students to test the app.</li>
+        </ul>
       </div>
     </div>
   );

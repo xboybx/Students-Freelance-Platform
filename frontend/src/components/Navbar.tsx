@@ -13,7 +13,7 @@ export const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-3 animate-slide-in">
             <BookOpen className="h-8 w-8 text-purple-600" />
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600  text-transparent bg-clip-text">
+            <span className="text-xl font-bold ">
               StudentSkills
             </span>
           </div>
